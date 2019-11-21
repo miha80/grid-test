@@ -37,7 +37,8 @@ export class DropEvent implements IEvent<IDroppedElemData> {
 }
 
 export interface IResizedElemData {
-  elemId: string;
+  elemId: number;
+  bounds: IBounds;
 }
 
 export class ResizeEvent implements IEvent<IResizedElemData> {
@@ -53,3 +54,12 @@ export class InitEvent implements IEvent<GridElement[]> {
 }
 
 export type GridEvent = InitEvent | DropEvent | ResizeEvent;
+
+export interface IResizeStartData {
+  elemId: number;
+  pageX: number;
+  pageY: number;
+  elemWidth: number;
+  elemHeight: number;
+  resizedElem: HTMLElement;
+}

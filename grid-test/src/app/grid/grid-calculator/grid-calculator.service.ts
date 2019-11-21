@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GridElement } from '../models/grid-element/grid-element';
-import { IBounds, IDroppedElemData } from '../models/interfaces';
+import { IBounds, IDroppedElemData, IResizedElemData } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,6 @@ export class GridCalculatorService {
   private getDependentElemsBelow(currentElem: GridElement, movedElem: GridElement, allElems: GridElement[]): GridElement[] {
 
     let dependentElems: GridElement[] = [];
-    // let currentElem: GridElement = allElems[rectIndex];
     allElems.forEach((nextElem: GridElement) => {
       if (nextElem.isAbove(currentElem) && this.isXIntersection(nextElem, currentElem) && nextElem.id !== movedElem.id) {
         dependentElems.push(nextElem);
@@ -78,7 +77,7 @@ export class GridCalculatorService {
                                         .map((nextElem: GridElement) => {
                                           return (nextElem.top + nextElem.height + gutter) - elem.top;
                                         })
-    let topDiff: number = topDiffs.length > 0 ? Math.max(...topDiffs) : 0;
+    let topDiff: number = topDiffs.length > 0 ? Math.max(...topDiffs) : -elem.top;
     elem.setLeftTop(elem.left, elem.top + topDiff, responsiveGridWidth, margin, gridStep);
     return elem;
   }
@@ -147,6 +146,29 @@ export class GridCalculatorService {
       return this.moveElemDown(nextElem, restElems, gutter, responsiveGridWidth, margin, gridStep);
     });
     this.moveOverlapedElemsUp(droppedElem, allElems, gutter, responsiveGridWidth, margin, gridStep);
+    allElems.sort(this.sortByLeftTop);
+    allElems.forEach((nextElem: GridElement) => this.moveElemDown(nextElem, allElems, gutter, responsiveGridWidth, margin, gridStep));
+    return allElems;
+  }
+
+  recalculatePositionsAfterResize(resizedElemData: IResizedElemData,
+                                  allElems: GridElement[],
+                                  gutter: number,
+                                  responsiveGridWidth: number,
+                                  margin: number,
+                                  gridStep: number): GridElement[] {
+
+    let resizedElem: GridElement;
+    const restElems: GridElement[] = allElems.filter((nextElem: GridElement) => {
+      const condition: boolean = nextElem.id === resizedElemData.elemId;
+      if (condition) {
+        resizedElem = nextElem;
+      }
+      return !condition;
+    });
+    resizedElem.setWidthHeight(resizedElemData.bounds.width, resizedElemData.bounds.height, responsiveGridWidth, margin, gridStep);
+
+    this.moveOverlapedElemsUp(resizedElem, allElems, gutter, responsiveGridWidth, margin, gridStep);
     allElems.sort(this.sortByLeftTop);
     allElems.forEach((nextElem: GridElement) => this.moveElemDown(nextElem, allElems, gutter, responsiveGridWidth, margin, gridStep));
     return allElems;

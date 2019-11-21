@@ -1,3 +1,3 @@
 <div #responsiveGridContainer class="responsive-grid">
-    <responsive-grid (elemDropped)="droppedElemHandler($event)" [gridElements]="gridElements"></responsive-grid>
+    <responsive-grid (elemResized)="elemResizedEventHandler($event)" (elemDropped)="droppedElemHandler($event)" [gridElements]="gridElements"></responsive-grid>
 </div>

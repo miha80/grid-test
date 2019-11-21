@@ -1,4 +1,4 @@
-<div draggable="true"
+<div #gridElem draggable="true"
       *ngFor="let item of gridElements"
       [style.left.px]="item.left"
       [style.top.px]="item.top"
@@ -16,6 +16,6 @@
     <span class="item__text">{{item.id}}</span>
 
   </div>
-  <div class="item__resize-area"></div>
+  <div (mousedown)="mouseDownHandler($event, item, gridElem)" class="item__resize-area"></div>
 </div>
 

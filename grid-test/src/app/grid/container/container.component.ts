@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { GridElement } from '../models/grid-element/grid-element';
 import { GridCalculatorService } from '../grid-calculator/grid-calculator.service';
-import { IDroppedElemData, DropEvent, GridEvent, EGridEvents, InitEvent } from '../models/interfaces';
+import { IDroppedElemData, DropEvent, GridEvent, EGridEvents, InitEvent, ResizeEvent } from '../models/interfaces';
 import { Subject, Observable, Subscription, animationFrameScheduler } from 'rxjs';
 import { map, observeOn } from 'rxjs/operators';
 
@@ -34,6 +34,10 @@ export class ContainerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.eventSubj.next($event);
   }
 
+  elemResizedEventHandler($event: ResizeEvent) {
+this.eventSubj.next($event);
+  }
+
   ngOnInit() {
     this.gridElements = this._grid_calculator_service.getInitialTestElems(this.gutter,this.margin, this.getResponsiveGridWidth());
     this.gridEventsSubscription = this.eventSubj.pipe(
@@ -53,6 +57,17 @@ export class ContainerComponent implements OnInit, AfterViewInit, OnDestroy {
                                                       this.margin,
                                                       this.gridStep
                                                     );
+          } break;
+
+          case EGridEvents.RESIZE: {
+            result = this._grid_calculator_service.recalculatePositionsAfterResize(
+                                                      event.payload,
+                                                      this.gridElements,
+                                                      this.gutter,
+                                                      this.getResponsiveGridWidth(),
+                                                      this.margin,
+                                                      this.gridStep
+                                                    )
           } break;
         }
         return result;
