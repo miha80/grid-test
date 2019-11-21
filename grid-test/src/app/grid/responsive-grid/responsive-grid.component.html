@@ -1,0 +1,21 @@
+<div draggable="true"
+      *ngFor="let item of gridElements"
+      [style.left.px]="item.left"
+      [style.top.px]="item.top"
+      [style.width.px]="item.width"
+      [style.height.px]="item.height"
+      (dragstart)="dragStartHandler($event, item)"
+      (dragover)="dragOverHandler($event)"
+      (dragenter)="dragEnterHandler($event)"
+      (drop)="dropHandler($event, item)"
+      (dragend)="dragEndHandler($event)"
+      class="item">
+
+  <div class="item__toolbar"></div>
+  <div class="item__content">
+    <span class="item__text">{{item.id}}</span>
+
+  </div>
+  <div class="item__resize-area"></div>
+</div>
+
