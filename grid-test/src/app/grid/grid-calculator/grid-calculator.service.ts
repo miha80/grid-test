@@ -81,13 +81,19 @@ export class GridCalculatorService {
                 gridStep: number): GridElement {
     const topDiffs: number[] = allElems.filter((nextElem: GridElement) => {
                                           const condition = elem.isAbove(nextElem) && this.isXIntersection(nextElem, elem);
+                                          if (elem.id === 27) {
+                                          }
                                           return condition;
                                         })
                                         .map((nextElem: GridElement) => {
                                           return (nextElem.top + nextElem.height + gutter) - elem.top;
                                         })
+
     let topDiff: number = topDiffs.length > 0 ? Math.max(...topDiffs) : -elem.top;
     elem.setLeftTop(elem.left, elem.top + topDiff, responsiveGridWidth, margin, gridStep);
+    if (elem.id === 27) {
+      console.log('27 topDiff', topDiff, elem.top,  elem.top + topDiff)
+    }
     return elem;
   }
 
@@ -144,14 +150,23 @@ export class GridCalculatorService {
   ): GridElement[] {
 
     let droppedElem: GridElement;
-    const restElems: GridElement[] = allElems.filter((nextElem: GridElement) => {
+    let droppedElemIndex: number;
+    const restElems: GridElement[] = allElems.filter((nextElem: GridElement, nextIndex: number) => {
       const condition: boolean = nextElem.id === droppedElemData.elemId;
       if (condition) {
         droppedElem = nextElem;
+        droppedElemIndex = nextIndex;
       }
       return !condition;
     });
     droppedElem.setLeftTop(droppedElemData.bounds.left, droppedElemData.bounds.top, responsiveGridWidth, margin, gridStep);
+    allElems[droppedElemIndex] = new GridElement(
+        droppedElemData.bounds.left,
+        droppedElemData.bounds.top,
+        droppedElem.width,
+        droppedElem.height,
+        droppedElem.id);
+    console.log('droppedElem top', droppedElem.top, droppedElemIndex)
     restElems.forEach((nextElem: GridElement) => {
       return this.moveElemDown(nextElem, restElems, gutter, responsiveGridWidth, margin, gridStep);
     });
