@@ -12,6 +12,7 @@ export interface IDraggedData {
   id: number;
   realMouseX: number;
   realMouseY: number;
+  dragElem: HTMLElement;
 }
 
 export interface IDroppedElemData {

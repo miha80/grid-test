@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GridElement } from '../models/grid-element/grid-element';
-import { IBounds, IDroppedElemData, IResizedElemData } from '../models/interfaces';
+import { IDroppedElemData, IResizedElemData } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,19 @@ export class GridCalculatorService {
 
   getInitialTestElems(gutter: number,
                       margin: number,
-                      responsiveGridWidth: number): GridElement[] {
-    const rows = 3;
-    const columns = 10;
-    const vertTailNum = 5;
+                      responsiveGridWidth: number)
+    : GridElement[] {
+
+    let rows = 3;
+    let columns = 10;
+    let vertTailNum = 5;
+    if (window.screen.width <= 1000) {
+      rows = 15;
+      columns = 2;
+    } else if (window.screen.width <= 500) {
+      rows = 30;
+      columns = 1;
+    }
     const horTailNum = Math.floor((responsiveGridWidth - 2 * margin - (columns - 1) * gutter) / (columns * gutter));
     const initElemWidth = horTailNum * gutter;
     const initElemHeight = vertTailNum * gutter;
@@ -131,7 +140,8 @@ export class GridCalculatorService {
                                       gutter: number,
                                       responsiveGridWidth: number,
                                       margin: number,
-                                      gridStep: number): GridElement[] {
+                                      gridStep: number
+  ): GridElement[] {
 
     let droppedElem: GridElement;
     const restElems: GridElement[] = allElems.filter((nextElem: GridElement) => {

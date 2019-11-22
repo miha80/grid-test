@@ -1,7 +1,7 @@
-import { Component, OnInit, HostBinding, AfterViewInit, Input,
+import { Component, HostBinding, Input,
   HostListener, Renderer2, Output, EventEmitter } from '@angular/core';
 import { GridElement } from '../models/grid-element/grid-element';
-import { IDraggedData, IDroppedElemData, DropEvent, EGridEvents, IResizedElemData, IResizeStartData, ResizeEvent } from '../models/interfaces';
+import { IDraggedData, IDroppedElemData, DropEvent, IResizedElemData, IResizeStartData, ResizeEvent } from '../models/interfaces';
 
 export enum EZones {
   DRAG = 'drag',
@@ -13,9 +13,10 @@ export enum EZones {
   templateUrl: './responsive-grid.component.html',
   styleUrls: ['./responsive-grid.component.scss']
 })
-export class ResponsiveGridComponent implements OnInit, AfterViewInit {
+export class ResponsiveGridComponent {
 
   private resizeStartData: IResizeStartData;
+  private draggedData: IDraggedData;
 
   @Input() gridElements: GridElement[];
 
@@ -36,6 +37,7 @@ export class ResponsiveGridComponent implements OnInit, AfterViewInit {
       this.elemResized.emit(resizeEvent);
     }
     this.resizeStartData = undefined;
+    this.dropHandler($event);
   }
 
   @HostListener('mousemove', ['$event']) mouseMoveHandler($event: MouseEvent) {
@@ -43,70 +45,58 @@ export class ResponsiveGridComponent implements OnInit, AfterViewInit {
       const resizeEvent: ResizeEvent = this.getResizeEvent($event);
       this.elemResized.emit(resizeEvent);
     }
-  }
-
-  dragStartHandler($event: DragEvent, item: GridElement) {
-    if (this.resizeStartData) {
-      return false;
-    }
-    if (($event.target as HTMLElement).getAttribute('drag-zone')) {
-      return;
-    }
-    const target = $event.target; // : HTMLElement
-        this._renderer.setStyle(target, 'opacity', '0.005');
-        $event.dataTransfer.effectAllowed = 'move';
-        const data: IDraggedData = {
-          id: item.id,
-          realMouseX: item.left - $event.pageX,
-          realMouseY: item.top - $event.pageY,
-        }
-        $event.dataTransfer.setData('text/plain', JSON.stringify(data));
-
-  }
-
-  dragOverHandler($event: DragEvent) {
-      $event.preventDefault();
-  }
-
-  dragEnterHandler($event: DragEvent) {
-      $event.preventDefault();
-  }
-
-  dropHandler($event: DragEvent, item: GridElement) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    this._renderer.setStyle($event.target, 'opacity', '1');
-
-    const draggedData: IDraggedData = JSON.parse($event.dataTransfer.getData('text/plain'));
-    const droppedElemData: IDroppedElemData = {
-      elemId: draggedData.id,
-      bounds: {
-        left: $event.pageX + draggedData.realMouseX,
-        top: $event.pageY + draggedData.realMouseY,
-        width: item.width,
-        height: item.height,
-      }
-    }
-    this.elemDropped.emit(new DropEvent(droppedElemData));
-    console.log('drop droppedElemData', droppedElemData)
-  }
-
-  dragEndHandler($event: DragEvent) {
-    this._renderer.setStyle($event.target, 'opacity', '1');
+    this.dragOverHandler($event)
   }
 
   mouseDownHandler($event: MouseEvent, item: GridElement, resizedElem: HTMLElement) {
+    $event.stopPropagation();
     this.resizeStartData = {
       elemId: item.id,
       pageX: $event.pageX,
       pageY: $event.pageY,
       elemWidth: item.width,
       elemHeight: item.height,
-
       resizedElem: resizedElem,
     };
     this._renderer.setStyle(resizedElem, 'z-index', 10);
-    console.log('mouseDownHandler', this.resizeStartData)
+  }
+
+  dragStartHandler($event: MouseEvent, item: GridElement, dragElem: HTMLElement) {
+    if (this.resizeStartData) {
+      return false;
+    }
+    const data: IDraggedData = {
+      id: item.id,
+      realMouseX: item.left - $event.pageX,
+      realMouseY: item.top - $event.pageY,
+      dragElem: dragElem,
+    }
+    this.draggedData = data;
+    this._renderer.setStyle(dragElem, 'z-index', 10);
+  }
+
+  dragOverHandler($event: MouseEvent) {
+    if (this.draggedData) {
+      this._renderer.setStyle(this.draggedData.dragElem, 'left', `${$event.pageX + this.draggedData.realMouseX}px`);
+      this._renderer.setStyle(this.draggedData.dragElem, 'top', `${$event.pageY + this.draggedData.realMouseY}px`);
+    }
+  }
+
+  dropHandler($event: MouseEvent) {
+    if (this.draggedData) {
+      this._renderer.setStyle(this.draggedData.dragElem, 'z-index', 'auto');
+      const droppedElemData: IDroppedElemData = {
+        elemId: this.draggedData.id,
+        bounds: {
+          left: $event.pageX + this.draggedData.realMouseX,
+          top: $event.pageY + this.draggedData.realMouseY,
+          width: undefined,
+          height: undefined,
+        }
+      }
+      this.elemDropped.emit(new DropEvent(droppedElemData));
+    }
+    this.draggedData = undefined;
   }
 
   getResizeEvent($event: MouseEvent): ResizeEvent {
@@ -120,13 +110,6 @@ export class ResponsiveGridComponent implements OnInit, AfterViewInit {
       }
     };
     return new ResizeEvent(resizedElemData);
-  }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewInit() {
-    console.log('width', this.width)
   }
 
 }
