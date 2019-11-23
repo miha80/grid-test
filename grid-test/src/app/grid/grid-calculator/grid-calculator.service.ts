@@ -91,9 +91,7 @@ export class GridCalculatorService {
 
     let topDiff: number = topDiffs.length > 0 ? Math.max(...topDiffs) : -elem.top;
     elem.setLeftTop(elem.left, elem.top + topDiff, responsiveGridWidth, margin, gridStep);
-    if (elem.id === 27) {
-      console.log('27 topDiff', topDiff, elem.top,  elem.top + topDiff)
-    }
+
     return elem;
   }
 
@@ -166,7 +164,6 @@ export class GridCalculatorService {
         droppedElem.width,
         droppedElem.height,
         droppedElem.id);
-    console.log('droppedElem top', droppedElem.top, droppedElemIndex)
     restElems.forEach((nextElem: GridElement) => {
       return this.moveElemDown(nextElem, restElems, gutter, responsiveGridWidth, margin, gridStep);
     });
@@ -181,7 +178,8 @@ export class GridCalculatorService {
                                   gutter: number,
                                   responsiveGridWidth: number,
                                   margin: number,
-                                  gridStep: number): GridElement[] {
+                                  gridStep: number,
+                                  minSize: number): GridElement[] {
 
     let resizedElem: GridElement;
     const restElems: GridElement[] = allElems.filter((nextElem: GridElement) => {
@@ -191,7 +189,7 @@ export class GridCalculatorService {
       }
       return !condition;
     });
-    resizedElem.setWidthHeight(resizedElemData.bounds.width, resizedElemData.bounds.height, responsiveGridWidth, margin, gridStep);
+    resizedElem.setWidthHeight(resizedElemData.bounds.width, resizedElemData.bounds.height, responsiveGridWidth, margin, gridStep, minSize);
 
     this.moveOverlapedElemsUp(resizedElem, allElems, gutter, responsiveGridWidth, margin, gridStep);
     allElems.sort(this.sortByLeftTop);

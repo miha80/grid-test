@@ -15,6 +15,7 @@ export class ContainerComponent implements OnInit, AfterViewInit, OnDestroy {
   public readonly gridStep: number = 20;
   public readonly gutter: number = 20;
   public readonly margin: number = 20;
+  public readonly minSize: number = 100;
   public gridElements: GridElement[];
   public gridEventsSubscription: Subscription;
 
@@ -66,8 +67,9 @@ this.eventSubj.next($event);
                                                       this.gutter,
                                                       this.getResponsiveGridWidth(),
                                                       this.margin,
-                                                      this.gridStep
-                                                    )
+                                                      this.gridStep,
+                                                      this.minSize,
+                                                    );
           } break;
         }
         return result;

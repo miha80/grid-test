@@ -36,11 +36,12 @@ export class GridElement implements IBounds {
     this.top = Math.round((top - margin) / gridStep) * gridStep + margin;
   }
 
-  setWidthHeight(width: number, height: number, responsiveGridWidth: number, margin: number, gridStep: number) {
+  setWidthHeight(width: number, height: number, responsiveGridWidth: number, margin: number, gridStep: number, minSize: number) {
+    width = Math.max(width, minSize);
     width = Math.round(width / gridStep) * gridStep;
     width = Math.min(width, responsiveGridWidth - margin - this.left);
     this.width = width;
-
+    height = Math.max(height, minSize);
     this.height = Math.round(height / gridStep) * gridStep;
   }
 
