@@ -5,8 +5,17 @@
   box-sizing: border-box;
 }
 
-.responsive-grid {
-  width: 100vw;
-  height: 100vh;
-  border: 1px solid fuchsia;
+.item {
+  border: 1px solid yellowgreen;
+  background: greenyellow;
+  line-height: 50%;
+  /*min-width: 240px;*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.item-span {
+  font-size: 2rem;
+  font-weight: bold;
 }

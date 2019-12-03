@@ -1,14 +1,17 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { GridElement } from '../models/grid-element/grid-element';
 import { GridCalculatorService } from '../grid-calculator/grid-calculator.service';
-import { IDroppedElemData, DropEvent, GridEvent, EGridEvents, InitEvent, ResizeEvent } from '../models/interfaces';
-import { Subject, Observable, Subscription, animationFrameScheduler } from 'rxjs';
+import { DropEvent, GridEvent, EGridEvents, InitEvent, ResizeEvent } from '../models/interfaces';
+import { Subject, Subscription, animationFrameScheduler } from 'rxjs';
 import { map, observeOn } from 'rxjs/operators';
+
+declare var $: any;
 
 @Component({
   selector: 'app-container',
   templateUrl: './container.component.html',
-  styleUrls: ['./container.component.scss']
+  styleUrls: ['./container.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ContainerComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -85,6 +88,12 @@ this.eventSubj.next($event);
   }
 
   ngAfterViewInit() {
+    $(function () {
+      $('.grid-stack').gridstack({
+        minWidth: 550,
+        animate: true,
+      });
+    });
   }
 
   ngOnDestroy() {

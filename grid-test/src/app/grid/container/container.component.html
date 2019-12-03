@@ -1,3 +1,10 @@
-<div #responsiveGridContainer class="responsive-grid">
-    <responsive-grid (elemResized)="elemResizedEventHandler($event)" (elemDropped)="droppedElemHandler($event)" [gridElements]="gridElements"></responsive-grid>
+<div #responsiveGridContainer class="responsive-grid grid-stack">
+    <!--<responsive-grid (elemResized)="elemResizedEventHandler($event)" (elemDropped)="droppedElemHandler($event)" [gridElements]="gridElements"></responsive-grid> -->
+    <div *ngFor="let item of gridElements; index as i" class="grid-stack-item" data-gs-width="3" >
+      <div class="grid-stack-item-content item">
+        <span class="">
+        {{i}}
+        </span>
+      </div>
+    </div>
 </div>
